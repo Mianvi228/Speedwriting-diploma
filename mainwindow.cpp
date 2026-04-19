@@ -19,41 +19,50 @@ std::string timeFormat(unsigned long long timeInSec)
     return s.str();
 }
 
-QString formatEndsOfLines(const char* s)
+inline void formatEndsOfLines(QString &s)
 {
-    QString newS;
-    newS.replace("\n", "¶\n");
-    while (*s != '\0')
-    {
-        if (*s == '\n')
-        {
-            newS += "¶";
-        }
-        newS += *s;
-        s++;
-    }
-
-    return newS;
+#ifdef Q_OS_LINUX
+    s.replace("\n", "¶\n");
+#elif defined(Q_OS_WIN)
+    s.replace("\r\n", "¶\n");
+#endif
 }
 
-void MainWindow::initWindow()
+void MainWindow::initCounters()
 {
     errorsCounter = 0;
     keysCounter = 0;
     time = 0;
-    ui->LabelTime->setText(QString::fromStdString(timeFormat(time)));
-    ui->TextBox->setText(s);
-    if (timer != nullptr)
+
+    if (timer == nullptr)
+    {
+        timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, [=](){
+            time++;
+            ui->LabelTime->setText(QString::fromStdString(timeFormat(time)));
+            while (!q_keysPressed.isEmpty() && QDateTime::currentSecsSinceEpoch() - q_keysPressed.head() > timeWindow) {
+                q_keysPressed.dequeue();
+            }
+            ui->LabelKPM->setText(QString::asprintf("%lli", q_keysPressed.length()));
+        });
+    }
+    else
         timer->stop();
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [=](){
-        time++;
-        ui->LabelTime->setText(QString::fromStdString(timeFormat(time)));
-        while (!q_keysPressed.isEmpty() && QDateTime::currentSecsSinceEpoch() - q_keysPressed.head() > timeWindow) {
-            q_keysPressed.dequeue();
-        }
-        ui->LabelKPM->setText(QString::asprintf("%lli", q_keysPressed.length()));
-    });
+
+    if (!q_keysPressed.isEmpty()) {
+        q_keysPressed.clear();
+    }
+
+    ui->LabelTime->setText(QString::fromStdString(timeFormat(time)));
+    ui->LabelErrors->setText(QString::number(errorsCounter));
+    ui->LabelKeysPressed->setText(QString::number(keysCounter));
+    ui->LabelKPM->setText(QString::asprintf("%lli", q_keysPressed.length()));
+}
+
+void MainWindow::initWindow()
+{
+    initCounters();
+    ui->TextBox->setText(s);
     connect(ui->TextBox, &QLineEdit::textChanged, [=]() {
         ui->TextBox->setCursorPosition(0);
     });
@@ -76,7 +85,7 @@ MainWindow::~MainWindow()
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     QString eventText = e->text();
-    if (eventText == "\r") eventText = "¶\n";
+    eventText.replace("\r", "¶\n");
     if (!eventText.isEmpty())
     {
         keysCounter++;
@@ -84,6 +93,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         q_keysPressed.enqueue(QDateTime::currentSecsSinceEpoch());
 
         if (s == nullptr) {
+            errorsCounter++;
             QMessageBox msgBox;
             msgBox.setText("The end");
             msgBox.exec();
@@ -97,7 +107,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
                 {
                     fileReader.readBlock();
                     s = fileReader.getBlock();
-                    s.replace("\n", "¶\n");
+                    formatEndsOfLines(s);
                     ui->TextBox->setText(s);
                 }
                 else
@@ -122,8 +132,10 @@ void MainWindow::on_ResetButton_clicked()
     fileReader.resetFile();
     fileReader.readBlock();
     s = fileReader.getBlock();
-    s.replace("\n", "¶\n");
+    formatEndsOfLines(s);
     ui->TextBox->setText(s);
+    initCounters();
+    timer->start(1000);
 }
 
 void MainWindow::on_SelectTextButton_clicked()
@@ -132,6 +144,8 @@ void MainWindow::on_SelectTextButton_clicked()
     fileReader.selectFile(filename);
     fileReader.readBlock();
     s = fileReader.getBlock();
-    s.replace("\n", "¶\n");
+    formatEndsOfLines(s);
     ui->TextBox->setText(s);
+    initCounters();
+    timer->start(1000);
 }

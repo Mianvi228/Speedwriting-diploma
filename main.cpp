@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    w.setWindowFlag(Qt::WindowStaysOnTopHint, 1);
+ //   w.setWindowFlag(Qt::WindowStaysOnTopHint, 1);
     w.show();
     return a.exec();
 }

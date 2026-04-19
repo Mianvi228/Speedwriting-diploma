@@ -42,6 +42,7 @@ private:
     QQueue<qint64> q_keysPressed;
     const int timeWindow = 60;
 
+    void initCounters();
     void initWindow();
 };
 
