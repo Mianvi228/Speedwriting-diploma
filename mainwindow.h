@@ -2,10 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTimer>
-#include "FileBlockReader.h"
-#include <QQueue>
-#include <QElapsedTimer>
+#include <QStackedLayout>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,29 +19,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-protected:
-    void keyPressEvent(QKeyEvent *e);
-
 private slots:
-    void on_ResetButton_clicked();
-
-    void on_SelectTextButton_clicked();
+    void pageOne();
+    void pageTwo();
 
 private:
     Ui::MainWindow *ui;
-    FileBlockReader<8096> fileReader;
-    QTimer *timer = nullptr;
-    unsigned int time;
-    unsigned int keysCounter;
-    unsigned int errorsCounter;
-
-    QString s = "¶\n";
-    int sPos = 0;
-    QQueue<qint64> q_keysPressed;
-    const int timeWindow = 60;
-
-    void initCounters();
-    void initWindow();
+    QStackedLayout *stackedLayout;
+    QPushButton *pageOneButton;
+    QPushButton *pageTwoButton;
 };
 
 #endif // MAINWINDOW_H

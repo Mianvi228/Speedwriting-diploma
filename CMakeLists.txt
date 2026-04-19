@@ -28,6 +28,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         FileBlockReader.h
         ../HelloApp2/mainwindow.ui
+        exercisewidget.h exercisewidget.cpp exercisewidget.ui
+        utils.h utils.cpp
+
 
     )
 # Define target properties for Android with Qt 6 as:
