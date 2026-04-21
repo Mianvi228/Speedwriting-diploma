@@ -30,6 +30,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ../HelloApp2/mainwindow.ui
         exercisewidget.h exercisewidget.cpp exercisewidget.ui
         utils.h utils.cpp
+        actionbutton.h actionbutton.cpp
 
 
     )

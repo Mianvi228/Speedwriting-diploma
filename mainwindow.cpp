@@ -2,6 +2,9 @@
 #include "./ui_mainwindow.h"
 #include "exercisewidget.h"
 #include <QLabel>
+#include <QKeyEvent>
+#include <QShortcut>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,17 +17,20 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
 
-    QWidget *somePage = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(somePage);
-    layout->addWidget(new QLabel("Hola"));
-
     stackedLayout = new QStackedLayout;
-    ExerciseWidget *widget = new ExerciseWidget(this);
-    stackedLayout->addWidget(somePage);
-    stackedLayout->addWidget(widget);
 
     QWidget *stackContainer = new QWidget;
     stackContainer->setLayout(stackedLayout);
+
+    QWidget *widget = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addWidget(new QLabel("Hola"));
+
+    stackedLayout->addWidget(widget);
+
+    ExerciseWidget *widgetEx = new ExerciseWidget(this);
+
+    stackedLayout->addWidget(widgetEx);
 
     pageOneButton = new QPushButton("Page 1");
     pageTwoButton = new QPushButton("Page 2");
@@ -39,6 +45,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(pageOneButton, &QPushButton::clicked, this, &MainWindow::pageOne);
     connect(pageTwoButton, &QPushButton::clicked, this, &MainWindow::pageTwo);
+
+    QShortcut *leftShortcut = new QShortcut(QKeySequence(Qt::Key_Left), this);
+    QShortcut *rightShortcut = new QShortcut(QKeySequence(Qt::Key_Right) , this);
+
+    connect(leftShortcut, &QShortcut::activated, [this]() {
+        int prev = stackedLayout->currentIndex() - 1;
+        qInfo() << prev;
+        if (prev >= 0) stackedLayout->setCurrentIndex(prev);
+        stackedLayout->currentWidget()->setFocus();
+    });
+
+    connect(rightShortcut, &QShortcut::activated, [this]() {
+        int next = stackedLayout->currentIndex() + 1;
+        qInfo() << next;
+        if (next < stackedLayout->count()) stackedLayout->setCurrentIndex(next);
+        stackedLayout->currentWidget()->setFocus();
+    });
 }
 
 MainWindow::~MainWindow()
@@ -46,12 +69,32 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+}
+
 void MainWindow::pageOne()
 {
-    stackedLayout->setCurrentIndex(0);
+    if (stackedLayout->currentWidget() != nullptr)
+        stackedLayout->removeWidget(stackedLayout->currentWidget());
+
+    QWidget *widget = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addWidget(new QLabel("Hola"));
+
+    stackedLayout->addWidget(widget);
+
+    stackedLayout->currentWidget()->setFocus();
 }
 
 void MainWindow::pageTwo()
 {
-    stackedLayout->setCurrentIndex(1);
+    if (stackedLayout->currentWidget() != nullptr)
+        stackedLayout->removeWidget(stackedLayout->currentWidget());
+
+    ExerciseWidget *widget = new ExerciseWidget(this);
+
+    stackedLayout->addWidget(widget);
+
+    stackedLayout->currentWidget()->setFocus();
 }

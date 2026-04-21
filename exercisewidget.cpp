@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 #include "utils.h"
+#include "actionbutton.h"
 
 inline void formatEndsOfLines(QString &s)
 {
@@ -50,10 +51,17 @@ void ExerciseWidget::initCounters()
 void ExerciseWidget::initWindow()
 {
     initCounters();
-    ui->TextBox->setText(s);
     connect(ui->TextBox, &QLineEdit::textChanged, [=]() {
         ui->TextBox->setCursorPosition(0);
     });
+    ui->TextBox->setText(s);
+    ActionButton *qButton = new ActionButton("Й", Qt::Key_Q, this);
+    ui->gridLayout_2->addWidget(qButton, 0, 0);
+    ActionButton *wButton = new ActionButton("Ц", Qt::Key_W, this);
+    ui->gridLayout_2->addWidget(wButton, 0, 1);
+    ActionButton *eButton = new ActionButton("У", Qt::Key_E, this);
+    ui->gridLayout_2->addWidget(eButton, 0, 2);
+
     timer->start(1000);
 }
 
