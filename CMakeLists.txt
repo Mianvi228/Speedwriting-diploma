@@ -31,6 +31,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         exercisewidget.h exercisewidget.cpp exercisewidget.ui
         utils.h utils.cpp
         actionbutton.h actionbutton.cpp
+        virtualkeyboard.h virtualkeyboard.cpp
+        styles.qss
 
 
     )

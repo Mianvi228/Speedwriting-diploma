@@ -14,21 +14,31 @@ private:
     Qt::Key key;
     QString action;
     QString description;
-    QString normalColor = "#3a6ea5";
-    QString pressedColor = "#5a8ec5";
-    bool active = false;
+    QColor normalColor = QColor(58, 110, 165, 255);
+    QColor pressedColor = QColor(90, 140, 229, 255);
+    QColor highlightColor = QColor(255, 242, 0, 255);
+    QColor actionLabelColor = QColor(255, 215, 0, 255);
+    QColor descriptionLabelColor = QColor(255, 255, 255, 255);
+    bool active = true;
+    bool highlighted = false;
+    bool pressed = false;
 
     QLabel* actionLabel;
-    QLabel* keyLabel;
+    QLabel* descriptionLabel;
 
 public:
     explicit ActionButton(QWidget *parent);
 
     ActionButton(const QString& actionName,
                  Qt::Key shortcut,
-                 QWidget* parent = nullptr);
+                 QWidget* parent = nullptr,
+                 const QString& description = "");
 
     void setColors(const QString& normal, const QString& pressed);
+    void setActive();
+    void unsetActive();
+    void setHighlighted();
+    void unsetHighlighted();
 
 signals:
     void triggered();
@@ -37,7 +47,7 @@ signals:
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
 
-private:
+public:
     void updateStyle();
 };
 

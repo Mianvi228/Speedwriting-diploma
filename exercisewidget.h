@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include <QQueue>
+#include <QMap>
 #include "FileBlockReader.h"
+#include "actionbutton.h"
 
 namespace Ui {
 class ExerciseWidget;
@@ -32,6 +34,7 @@ private:
     unsigned int time;
     unsigned int keysCounter;
     unsigned int errorsCounter;
+    QMap<QString, ActionButton*> mapKeyToButton;
 
     QString s = "¶\n";
     int sPos = 0;
@@ -39,6 +42,7 @@ private:
     const int timeWindow = 60;
 
     void initCounters();
+    void initHelpKeyboard();
     void initWindow();
 };
 

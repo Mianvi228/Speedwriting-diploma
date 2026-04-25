@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,10">
@@ -180,8 +180,8 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_2"/>
+   <item row="2" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_3"/>
    </item>
   </layout>
  </widget>

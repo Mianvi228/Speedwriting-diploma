@@ -1,0 +1,31 @@
+ActionButton {
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    background-color: rgba(255, 215, 0, 30);
+    font-weight: bold;
+    padding: 5px;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+ActionButton[highlighted="true"] {
+    background-color: rgba(255, 215, 0, 80);
+    border: 2px solid #FFA500;
+}
+
+ActionButton:disabled {
+    background-color: rgba(80, 80, 80, 50);
+    border: 1px solid #404040;
+    color: #808080;
+}
+
+/* Label styles */
+QLabel {
+    color: white;
+    font-size: 14px;
+}
+
+QWidget > QLabel {
+    font-weight: bold;
+    color: #FFD700;
+}
