@@ -11,7 +11,8 @@ class ActionButton : public QWidget {
     Q_OBJECT
 
 private:
-    Qt::Key key;
+    Qt::Key *mainKey, *subKey;
+    quint32 code;
     QString action;
     QString description;
     QColor normalColor = QColor(58, 110, 165, 255);
@@ -19,6 +20,7 @@ private:
     QColor highlightColor = QColor(255, 242, 0, 255);
     QColor actionLabelColor = QColor(255, 215, 0, 255);
     QColor descriptionLabelColor = QColor(255, 255, 255, 255);
+    int borderRadius = 8;
     bool active = true;
     bool highlighted = false;
     bool pressed = false;
@@ -30,15 +32,18 @@ public:
     explicit ActionButton(QWidget *parent);
 
     ActionButton(const QString& actionName,
-                 Qt::Key shortcut,
+                 Qt::Key *mainKey = nullptr,
                  QWidget* parent = nullptr,
-                 const QString& description = "");
+                 const QString& description = "",
+                 Qt::Key *subKey = nullptr,
+                 quint32 code = 0);
 
     void setColors(const QString& normal, const QString& pressed);
     void setActive();
     void unsetActive();
     void setHighlighted();
     void unsetHighlighted();
+    void setMonitorParent(QWidget *parent);
 
 signals:
     void triggered();
@@ -49,6 +54,9 @@ protected:
 
 public:
     void updateStyle();
+
+private:
+    static void loadOrCreateGlobalStyle(ActionButton &btn);
 };
 
 

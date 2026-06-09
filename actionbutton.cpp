@@ -1,11 +1,22 @@
 #include "actionbutton.h"
 
+#include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFileInfo>
+
 ActionButton::ActionButton(const QString& actionName,
-                 Qt::Key shortcut,
+                 Qt::Key *mainKey,
                  QWidget* parent,
-                 const QString& description)
-        : QWidget(parent), action(actionName), key(shortcut)
+                 const QString& description,
+                 Qt::Key *subKey,
+                 quint32 code)
+    : QWidget(parent), action(actionName), mainKey(mainKey), subKey(subKey), code(code)
 {
+    loadOrCreateGlobalStyle(*this);
+
     setMinimumSize(10, 10);
     setFocusPolicy(Qt::StrongFocus);
 
@@ -42,8 +53,10 @@ ActionButton::ActionButton(const QString& actionName,
 
 void ActionButton::setColors(const QString& normal, const QString& pressed)
 {
-    normalColor = normal;
-    pressedColor = pressed;
+    QColor n(normal);
+    QColor p(pressed);
+    if (n.isValid()) normalColor = n;
+    if (p.isValid()) pressedColor = p;
     updateStyle();
 }
 
@@ -77,15 +90,25 @@ void ActionButton::unsetActive()
     updateStyle();
 }
 
+void ActionButton::setMonitorParent(QWidget *monitorTarget)
+{
+    monitorTarget->installEventFilter(this);
+}
+
 bool ActionButton::eventFilter(QObject* obj, QEvent* event)
 {
-    if (!active)
+    /*
+      if (!active)
         return false;
+    */
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-        if (ke->key() == key && !pressed) {
+        if (((code != 0 && ke->nativeScanCode() == code) ||
+             (mainKey && ke->key() == *mainKey) ||
+             (subKey && ke->key() == *subKey)) &&
+             !pressed) {
             pressed = true;
-            highlighted = false;
+            //highlighted = false;
             updateStyle();
             emit triggered();
             return false;
@@ -93,7 +116,10 @@ bool ActionButton::eventFilter(QObject* obj, QEvent* event)
     }
     else if (event->type() == QEvent::KeyRelease) {
         QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-        if (ke->key() == key && pressed) {
+        if (((code != 0 && ke->nativeScanCode() == code) ||
+             (mainKey && ke->key() == *mainKey) ||
+             (subKey && ke->key() == *subKey)) &&
+             pressed) {
             pressed = false;
             updateStyle();
             emit released();
@@ -106,20 +132,68 @@ bool ActionButton::eventFilter(QObject* obj, QEvent* event)
 void ActionButton::updateStyle()
 {
     QColor color = pressed ? pressedColor : normalColor;
-    if (!highlighted)
-        setStyleSheet(QString("QWidget { background-color: %1; border-radius: 8px; }"
-                              "QWidget#actionLabel { background: transparent; font-size: 16px; font-weight: bold; color: %2; }"
-                              "QWidget#descriptionLabel { background: transparent; font-size: 14px; font-weight: bold; color: %3; }")
-                          .arg(color.name(QColor::HexArgb))
-                          .arg(actionLabelColor.name(QColor::HexArgb))
-                          .arg(descriptionLabelColor.name(QColor::HexArgb)));
-    else
-        setStyleSheet(QString("QWidget { background-color: %1; border-radius: 8px; }"
-                              "QWidget#actionLabel { background: transparent; font-size: 16px; font-weight: bold; color: %2; }"
-                              "QWidget#descriptionLabel { background: transparent; font-size: 14px; font-weight: bold; color: %3; }"
-                              "QWidget#mainLayout { border: 5px solid %4 }")
-                          .arg(color.name(QColor::HexArgb))
-                          .arg(actionLabelColor.name(QColor::HexArgb))
-                          .arg(descriptionLabelColor.name(QColor::HexArgb))
-                          .arg(highlightColor.name()));
+    QString style("QWidget { background-color: %1; border-radius: %4px; }"
+                  "QWidget#actionLabel { background: transparent; font-size: 16px; font-weight: bold; color: %2; }"
+                  "QWidget#descriptionLabel { background: transparent; font-size: 14px; font-weight: bold; color: %3; }");
+    style = style
+                    .arg(color.name(QColor::HexArgb))
+                    .arg(actionLabelColor.name(QColor::HexArgb))
+                    .arg(descriptionLabelColor.name(QColor::HexArgb))
+                    .arg(borderRadius);
+    if (highlighted)
+        style += QString("QWidget#mainLayout { border: 5px solid %4 }")
+                     .arg(highlightColor.name(QColor::HexArgb));
+    setStyleSheet(style);
+}
+
+void ActionButton::loadOrCreateGlobalStyle(ActionButton &btn)
+{
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (dir.isEmpty())
+        return;
+
+    QDir().mkpath(dir);
+    const QString path = dir + "/action_button_style.json";
+
+    // Create file with defaults if missing.
+    if (!QFileInfo::exists(path)) {
+        QJsonObject obj;
+        obj["normalColor"] = btn.normalColor.name(QColor::HexRgb);
+        obj["pressedColor"] = btn.pressedColor.name(QColor::HexRgb);
+        obj["highlightColor"] = btn.highlightColor.name(QColor::HexRgb);
+        obj["actionLabelColor"] = btn.actionLabelColor.name(QColor::HexRgb);
+        obj["descriptionLabelColor"] = btn.descriptionLabelColor.name(QColor::HexRgb);
+        obj["borderRadius"] = btn.borderRadius;
+        obj["version"] = 1;
+
+        QFile out(path);
+        if (out.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            out.write(QJsonDocument(obj).toJson(QJsonDocument::Indented));
+            out.close();
+        }
+        return;
+    }
+
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly))
+        return;
+
+    const QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
+    f.close();
+    if (!doc.isObject())
+        return;
+
+    const QJsonObject obj = doc.object();
+    const auto colorFrom = [](const QJsonValue &v, const QColor &fallback) {
+        const QString hex = v.toString();
+        QColor c(hex);
+        return c.isValid() ? c : fallback;
+    };
+
+    btn.normalColor = colorFrom(obj.value("normalColor"), btn.normalColor);
+    btn.pressedColor = colorFrom(obj.value("pressedColor"), btn.pressedColor);
+    btn.highlightColor = colorFrom(obj.value("highlightColor"), btn.highlightColor);
+    btn.actionLabelColor = colorFrom(obj.value("actionLabelColor"), btn.actionLabelColor);
+    btn.descriptionLabelColor = colorFrom(obj.value("descriptionLabelColor"), btn.descriptionLabelColor);
+    btn.borderRadius = qBound(0, obj.value("borderRadius").toInt(btn.borderRadius), 64);
 }

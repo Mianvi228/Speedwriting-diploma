@@ -1,10 +1,17 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "languageexercisewidget.h"
+#include "exercisedefinition.h"
 #include "exercisewidget.h"
+#include "historywidget.h"
+#include "settingswidget.h"
 #include <QLabel>
+#include <QFont>
 #include <QKeyEvent>
 #include <QShortcut>
 #include <QDebug>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,29 +29,21 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *stackContainer = new QWidget;
     stackContainer->setLayout(stackedLayout);
 
-    QWidget *widget = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Hola"));
+    stackedLayout->addWidget(new QWidget(this));
 
-    stackedLayout->addWidget(widget);
-
-    ExerciseWidget *widgetEx = new ExerciseWidget(this);
-
-    stackedLayout->addWidget(widgetEx);
-
-    pageOneButton = new QPushButton("Page 1");
-    pageTwoButton = new QPushButton("Page 2");
+    pageOneButton = new QPushButton("Menu");
+    historyButton = new QPushButton("History");
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(pageOneButton);
-    buttonLayout->addWidget(pageTwoButton);
+    buttonLayout->addWidget(historyButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
     mainLayout->addLayout(buttonLayout);
     mainLayout->addWidget(stackContainer);
 
     connect(pageOneButton, &QPushButton::clicked, this, &MainWindow::pageOne);
-    connect(pageTwoButton, &QPushButton::clicked, this, &MainWindow::pageTwo);
+    connect(historyButton, &QPushButton::clicked, this, &MainWindow::pageHistory);
 
     QShortcut *leftShortcut = new QShortcut(QKeySequence(Qt::Key_Left), this);
     QShortcut *rightShortcut = new QShortcut(QKeySequence(Qt::Key_Right) , this);
@@ -62,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent)
         if (next < stackedLayout->count()) stackedLayout->setCurrentIndex(next);
         stackedLayout->currentWidget()->setFocus();
     });
+
+    pageOne();
 }
 
 MainWindow::~MainWindow()
@@ -75,26 +76,60 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::pageOne()
 {
-    if (stackedLayout->currentWidget() != nullptr)
-        stackedLayout->removeWidget(stackedLayout->currentWidget());
-
-    QWidget *widget = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Hola"));
-
-    stackedLayout->addWidget(widget);
-
-    stackedLayout->currentWidget()->setFocus();
+    QWidget *homePage = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(homePage);
+    QPushButton *startExerciseButton = new QPushButton("Start exercise");
+    QPushButton *openHistoryButton = new QPushButton("View history metrics");
+    QPushButton *openSettingsButton = new QPushButton(tr("Settings"));
+    layout->addWidget(startExerciseButton);
+    layout->addWidget(openHistoryButton);
+    layout->addWidget(openSettingsButton);
+    connect(startExerciseButton, &QPushButton::clicked, this, &MainWindow::pageTwo);
+    connect(openHistoryButton, &QPushButton::clicked, this, &MainWindow::pageHistory);
+    connect(openSettingsButton, &QPushButton::clicked, this, &MainWindow::pageSettings);
+    replaceCurrentPage(homePage);
 }
 
 void MainWindow::pageTwo()
 {
-    if (stackedLayout->currentWidget() != nullptr)
-        stackedLayout->removeWidget(stackedLayout->currentWidget());
+    LanguageExerciseWidget *exercisePage = new LanguageExerciseWidget(this);
+    connect(exercisePage, &LanguageExerciseWidget::exerciseCompleted, this, &MainWindow::pageOne);
+    connect(exercisePage, &LanguageExerciseWidget::startDefinitionExercise,
+            this, &MainWindow::pageDefinitionExercise);
+    replaceCurrentPage(exercisePage);
+}
 
-    ExerciseWidget *widget = new ExerciseWidget(this);
+void MainWindow::pageDefinitionExercise(const ExerciseDefinition &definition)
+{
+    ExerciseWidget *exercisePage = new ExerciseWidget(this);
+    connect(exercisePage, &ExerciseWidget::exerciseCompleted, this, &MainWindow::pageTwo);
+    replaceCurrentPage(exercisePage);
+    exercisePage->startWithDefinition(definition);
+    exercisePage->setFocus();
+}
 
-    stackedLayout->addWidget(widget);
+void MainWindow::pageHistory()
+{
+    HistoryWidget *historyPage = new HistoryWidget(this);
+    replaceCurrentPage(historyPage);
+}
 
-    stackedLayout->currentWidget()->setFocus();
+void MainWindow::pageSettings()
+{
+    SettingsWidget *settingsPage = new SettingsWidget(this);
+    connect(settingsPage, &SettingsWidget::done, this, &MainWindow::pageOne);
+    replaceCurrentPage(settingsPage);
+}
+
+void MainWindow::replaceCurrentPage(QWidget *newPage)
+{
+    QWidget *current = stackedLayout->currentWidget();
+    if (current != nullptr) {
+        stackedLayout->removeWidget(current);
+        current->deleteLater();
+    }
+
+    stackedLayout->addWidget(newPage);
+    stackedLayout->setCurrentWidget(newPage);
+    newPage->setFocus();
 }

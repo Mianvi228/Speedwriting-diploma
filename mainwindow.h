@@ -5,6 +5,8 @@
 #include <QStackedLayout>
 #include <QPushButton>
 
+#include "exercisedefinition.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -25,12 +27,17 @@ protected:
 private slots:
     void pageOne();
     void pageTwo();
+    void pageHistory();
+    void pageSettings();
+    void pageDefinitionExercise(const ExerciseDefinition &definition);
 
 private:
+    void replaceCurrentPage(QWidget *newPage);
     Ui::MainWindow *ui;
     QStackedLayout *stackedLayout;
     QPushButton *pageOneButton;
     QPushButton *pageTwoButton;
+    QPushButton *historyButton;
 };
 
 #endif // MAINWINDOW_H

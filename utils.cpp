@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <QListWidget>
+
 QString timeFormat(unsigned long long timeInSec)
 {
     unsigned int hours = timeInSec / 3600;
@@ -11,4 +13,13 @@ QString timeFormat(unsigned long long timeInSec)
                     .arg(minutes, 2, 10, QChar('0'))
                     .arg(seconds, 2, 10, QChar('0'));
     return s;
+}
+
+void configureSideListWidget(QListWidget *list)
+{
+    if (list == nullptr)
+        return;
+
+    list->setCursor(Qt::ArrowCursor);
+    list->viewport()->setCursor(Qt::ArrowCursor);
 }
