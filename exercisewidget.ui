@@ -131,7 +131,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QLineEdit" name="TextBox">
+      <widget class="SavingLineEdit" name="TextBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -185,6 +185,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SavingLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>savinglineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

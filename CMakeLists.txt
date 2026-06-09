@@ -5,6 +5,7 @@ project(Speedwriting VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,8 +32,19 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         exercisewidget.h exercisewidget.cpp exercisewidget.ui
         utils.h utils.cpp
         actionbutton.h actionbutton.cpp
-        virtualkeyboard.h virtualkeyboard.cpp
+
         styles.qss
+        keyboardwidget.h
+        englishkeyboardwidget.h englishkeyboardwidget.cpp
+        savinglineedit.h savinglineedit.cpp
+        historywidget.h historywidget.cpp
+        keyboardpalette.h keyboardpalette.cpp
+        palettesettingswidget.h palettesettingswidget.cpp
+        settingswidget.h settingswidget.cpp
+        languageexercisewidget.h languageexercisewidget.cpp
+        exercisedefinition.h exercisedefinition.cpp
+        textexercisewidget.h textexercisewidget.cpp
+        exerciseoverviewwidget.h exerciseoverviewwidget.cpp
 
 
     )
