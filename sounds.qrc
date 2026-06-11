@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sound/key_click.wav</file>
+    </qresource>
+</RCC>
