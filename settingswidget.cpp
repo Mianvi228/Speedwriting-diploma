@@ -1,23 +1,28 @@
 #include "settingswidget.h"
 
 #include "palettesettingswidget.h"
+#include "soundsettingswidget.h"
 #include "utils.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
 
 namespace {
 const QString kKeyboardColorsId = QStringLiteral("keyboard_colors");
+const QString kSoundSettingsId = QStringLiteral("sound_setting");
 }
 
-SettingsWidget::SettingsWidget(QWidget *parent)
+SettingsWidget::SettingsWidget(SoundManager *soundManager, QWidget *parent)
     : QWidget(parent)
+    , soundManager(soundManager)
 {
     settingInfoById.insert(kKeyboardColorsId, {kKeyboardColorsId, tr("Keyboard colors")});
+    settingInfoById.insert(kSoundSettingsId, {kSoundSettingsId, tr("Sound")});
 
     auto *rootLayout = new QVBoxLayout(this);
 
@@ -45,10 +50,63 @@ SettingsWidget::SettingsWidget(QWidget *parent)
     rootLayout->addWidget(backButton);
 
     connect(settingsList, &QListWidget::currentRowChanged, this, &SettingsWidget::onSettingChanged);
-    connect(backButton, &QPushButton::clicked, this, &SettingsWidget::done);
+    connect(backButton, &QPushButton::clicked, this, &SettingsWidget::onBackToMenu);
 
     settingsList->setCurrentRow(0);
-    onSettingChanged();
+}
+
+bool SettingsWidget::hasUnsavedChangesForSetting(const QString &settingId) const
+{
+    if (settingId == kKeyboardColorsId && paletteSettingsWidget != nullptr)
+        return paletteSettingsWidget->hasUnsavedChanges();
+    if (settingId == kSoundSettingsId && soundSettingsWidget != nullptr)
+        return soundSettingsWidget->hasUnsavedChanges();
+    return false;
+}
+
+void SettingsWidget::saveSetting(const QString &settingId)
+{
+    if (settingId == kKeyboardColorsId && paletteSettingsWidget != nullptr)
+        paletteSettingsWidget->applyChanges();
+    else if (settingId == kSoundSettingsId && soundSettingsWidget != nullptr)
+        soundSettingsWidget->applyChanges();
+}
+
+void SettingsWidget::discardSetting(const QString &settingId)
+{
+    if (settingId == kKeyboardColorsId && paletteSettingsWidget != nullptr)
+        paletteSettingsWidget->discardChanges();
+    else if (settingId == kSoundSettingsId && soundSettingsWidget != nullptr)
+        soundSettingsWidget->discardChanges();
+}
+
+void SettingsWidget::promptSaveChangesForSetting(const QString &settingId)
+{
+    if (settingId.isEmpty() || !hasUnsavedChangesForSetting(settingId))
+        return;
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this,
+        tr("Save settings"),
+        tr("Save changes before leaving this setting?"),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::Yes);
+
+    if (answer == QMessageBox::Yes)
+        saveSetting(settingId);
+    else
+        discardSetting(settingId);
+}
+
+void SettingsWidget::showSettingPanel(const QString &settingId)
+{
+    QWidget *panel = settingsPanelForId(settingId);
+    if (panel == nullptr) {
+        showPlaceholder();
+        return;
+    }
+
+    settingsStack->setCurrentWidget(panel);
 }
 
 void SettingsWidget::showPlaceholder()
@@ -76,6 +134,9 @@ QWidget *SettingsWidget::settingsPanelForId(const QString &settingId)
         paletteSettingsWidget = new PaletteSettingsWidget(this);
         connect(paletteSettingsWidget, &PaletteSettingsWidget::done, this, &SettingsWidget::done);
         panel = paletteSettingsWidget;
+    } else if (settingId == kSoundSettingsId) {
+        soundSettingsWidget = new SoundSettingsWidget(soundManager, this);
+        panel = soundSettingsWidget;
     }
 
     if (panel == nullptr)
@@ -86,19 +147,32 @@ QWidget *SettingsWidget::settingsPanelForId(const QString &settingId)
     return panel;
 }
 
-void SettingsWidget::onSettingChanged()
+void SettingsWidget::onSettingChanged(int row)
 {
-    const QListWidgetItem *item = settingsList->currentItem();
+    if (row < 0)
+        return;
+
+    const QListWidgetItem *item = settingsList->item(row);
     if (item == nullptr) {
         showPlaceholder();
         return;
     }
 
-    QWidget *panel = settingsPanelForId(item->data(Qt::UserRole).toString());
-    if (panel == nullptr) {
-        showPlaceholder();
+    const QString newSettingId = item->data(Qt::UserRole).toString();
+    if (newSettingId == activeSettingId)
         return;
-    }
 
-    settingsStack->setCurrentWidget(panel);
+    if (!activeSettingId.isEmpty())
+        promptSaveChangesForSetting(activeSettingId);
+
+    activeSettingId = newSettingId;
+    showSettingPanel(newSettingId);
+}
+
+void SettingsWidget::onBackToMenu()
+{
+    if (!activeSettingId.isEmpty())
+        promptSaveChangesForSetting(activeSettingId);
+
+    emit done();
 }

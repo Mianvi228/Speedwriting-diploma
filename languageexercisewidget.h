@@ -20,11 +20,13 @@ public:
 
 signals:
     void exerciseCompleted();
+    void selectText(const ExerciseDefinition &definition);
     void startDefinitionExercise(const ExerciseDefinition &definition);
 
 private slots:
     void onLanguageChanged();
     void onExerciseChanged();
+    void onSelectText(const ExerciseDefinition &definition);
     void onStartDefinitionExercise(const ExerciseDefinition &definition);
 
 private:

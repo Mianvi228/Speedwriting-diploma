@@ -24,6 +24,7 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
         auto *row = new QHBoxLayout();
         auto *label = new QLabel(tr("Default (not in groups)"));
         auto *btn = new QPushButton();
+        defaultColorButton = btn;
         btn->setFixedSize(56, 28);
         btn->setObjectName("defaultColorBtn");
         connect(btn, &QPushButton::clicked, this, [this, btn]() {
@@ -40,9 +41,7 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
         row->addWidget(btn);
         root->addLayout(row);
 
-        // initialize button color
-        btn->setStyleSheet(QString("QPushButton { background-color: %1; border-radius: 4px; }")
-                           .arg(palette.defaultColor().name(QColor::HexRgb)));
+        refreshDefaultColorButton();
     }
 
     for (int i = 0; i < KeyboardPalette::GroupCount; ++i) {
@@ -102,6 +101,15 @@ QString PaletteSettingsWidget::groupKeys(int groupIndex)
     }
 }
 
+void PaletteSettingsWidget::refreshDefaultColorButton()
+{
+    if (defaultColorButton == nullptr)
+        return;
+
+    defaultColorButton->setStyleSheet(QString("QPushButton { background-color: %1; border-radius: 4px; }")
+                                      .arg(palette.defaultColor().name(QColor::HexRgb)));
+}
+
 void PaletteSettingsWidget::refreshButtons()
 {
     const QVector<QColor> colors = palette.normalColors();
@@ -146,15 +154,42 @@ void PaletteSettingsWidget::onPickColor(int groupIndex)
 
 void PaletteSettingsWidget::onSaveClicked()
 {
-    palette.save();
+    applyChanges();
     QMessageBox::information(this, tr("Settings saved"), tr("Keyboard palette has been updated."));
     emit done();
+}
+
+bool PaletteSettingsWidget::hasUnsavedChanges() const
+{
+    const KeyboardPalette saved = KeyboardPalette::loadOrCreateDefault();
+
+    if (palette.defaultColor() != saved.defaultColor())
+        return true;
+    if (palette.keyboardVisibleDuringExercise() != saved.keyboardVisibleDuringExercise())
+        return true;
+
+    const QVector<QColor> currentColors = palette.normalColors();
+    const QVector<QColor> savedColors = saved.normalColors();
+    return currentColors != savedColors;
+}
+
+void PaletteSettingsWidget::applyChanges()
+{
+    palette.save();
+}
+
+void PaletteSettingsWidget::discardChanges()
+{
+    palette = KeyboardPalette::loadOrCreateDefault();
+    refreshDefaultColorButton();
+    refreshButtons();
+    refreshVisibilityToggle();
 }
 
 void PaletteSettingsWidget::onResetClicked()
 {
     palette = KeyboardPalette::defaultPalette();
-    palette.save();
+    refreshDefaultColorButton();
     refreshButtons();
     refreshVisibilityToggle();
 }

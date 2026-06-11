@@ -10,8 +10,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Multimedia)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Multimedia)
 
 set(TS_FILES Speedwriting_ru_RU.ts)
 
@@ -45,6 +45,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         exercisedefinition.h exercisedefinition.cpp
         textexercisewidget.h textexercisewidget.cpp
         exerciseoverviewwidget.h exerciseoverviewwidget.cpp
+        sounds.qrc
+        soundmanager.h soundmanager.cpp
+        soundsettingswidget.h soundsettingswidget.cpp
 
 
     )
@@ -70,7 +73,7 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
-target_link_libraries(Speedwriting PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Speedwriting PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

@@ -30,7 +30,7 @@ HistoryWidget::HistoryWidget(QWidget *parent, const QString &exerciseIdFilter)
 }
 
 namespace {
-    const QString kFreeTypingId = QStringLiteral("Free typing");
+    const QString kFreeTypingEnId = QStringLiteral("Free typing en");
 }
 
 void HistoryWidget::loadSessions()
@@ -59,8 +59,9 @@ void HistoryWidget::loadSessions()
         const QJsonObject obj = value.toObject();
 
         QString exerciseId = obj.value("exerciseId").toString();
-        if (exerciseId.isEmpty())
-            exerciseId = kFreeTypingId;
+        /*if (exerciseId.isEmpty())
+            exerciseId = kFreeTypingEnId;
+        */
 
         if (!exerciseIdFilter.isEmpty() && exerciseId != exerciseIdFilter)
             continue;

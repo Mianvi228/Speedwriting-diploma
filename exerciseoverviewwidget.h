@@ -20,10 +20,12 @@ public:
     const ExerciseDefinition &exerciseDefinition() const { return definition; }
 
 signals:
+    void selectTextRequested(const ExerciseDefinition &definition);
     void startExerciseRequested(const ExerciseDefinition &definition);
 
 private slots:
     void onStartExercise();
+    void onSelectText();
 
 private:
     ExerciseDefinition definition;

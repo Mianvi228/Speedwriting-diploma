@@ -6,6 +6,7 @@
 #include <QPushButton>
 
 #include "exercisedefinition.h"
+#include "soundmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,19 +26,21 @@ protected:
     void keyPressEvent(QKeyEvent *e);
 
 private slots:
-    void pageOne();
-    void pageTwo();
+    void mainMenu();
+    void exerciseMenu();
     void pageHistory();
     void pageSettings();
     void pageDefinitionExercise(const ExerciseDefinition &definition);
+    void pageSelectedText(const ExerciseDefinition &definition);
 
 private:
     void replaceCurrentPage(QWidget *newPage);
     Ui::MainWindow *ui;
     QStackedLayout *stackedLayout;
-    QPushButton *pageOneButton;
-    QPushButton *pageTwoButton;
+    QPushButton *mainMenuButton;
+    QPushButton *exerciseMenuButton;
     QPushButton *historyButton;
+    SoundManager *soundManager;
 };
 
 #endif // MAINWINDOW_H

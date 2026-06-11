@@ -10,6 +10,7 @@
 #include "FileBlockReader.h"
 #include "actionbutton.h"
 #include "keyboardwidget.h"
+#include "soundmanager.h"
 
 namespace Ui {
 class ExerciseWidget;
@@ -24,8 +25,11 @@ public:
     ~ExerciseWidget();
 
     void startWithDefinition(const ExerciseDefinition &definition);
+    static void setSoundManager(SoundManager* soundManager);
+    const QString getFilename() const;
 
 signals:
+    void textSelected();
     void exerciseCompleted();
 
 protected:
@@ -35,6 +39,7 @@ protected:
 private slots:
     void on_ResetButton_clicked();
 
+public slots:
     void on_SelectTextButton_clicked();
 
 private:
@@ -46,6 +51,8 @@ private:
     unsigned int errorsCounter;
     QMap<QString, ActionButton*> mapKeyToButton;
     KeyboardWidget *keyboard = nullptr;
+
+    static SoundManager *soundManager;
 
     QString s = "";
     ExerciseDefinition currentDefinition;

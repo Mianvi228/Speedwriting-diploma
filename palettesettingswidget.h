@@ -15,15 +15,21 @@ class PaletteSettingsWidget : public QWidget
 public:
     explicit PaletteSettingsWidget(QWidget *parent = nullptr);
 
+    bool hasUnsavedChanges() const;
+    void applyChanges();
+    void discardChanges();
+
 signals:
     void done();
 
 private:
     KeyboardPalette palette;
     QVector<QPushButton *> colorButtons;
+    QPushButton *defaultColorButton = nullptr;
     QCheckBox *showKeyboardCheckBox = nullptr;
 
     void refreshButtons();
+    void refreshDefaultColorButton();
     void refreshVisibilityToggle();
     static QString groupKeys(int groupIndex);
     void setButtonColor(int groupIndex, const QColor &color);

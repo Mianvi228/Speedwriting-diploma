@@ -18,6 +18,8 @@
 #include "utils.h"
 #include "keyboardpalette.h"
 
+SoundManager* ExerciseWidget::soundManager = nullptr;
+
 inline void formatEndsOfLines(QString &s)
 {
 #ifdef Q_OS_LINUX
@@ -175,7 +177,8 @@ void ExerciseWidget::startWithDefinition(const ExerciseDefinition &definition)
     ui->SelectTextButton->setVisible(false);
     ui->ResetButton->setVisible(false);
     setKeyboardForLanguage(definition.keyboardLanguageId);
-    loadText(definition.text);
+    if (!definition.id.contains("Free typing"))
+        loadText(definition.text);
     initCounters();
     setFocus();
     timer->start(1000);
@@ -201,6 +204,9 @@ void ExerciseWidget::initWindow()
     });
     ui->TextBox->setText(s);
     initHelpKeyboard();
+
+    ui->SelectTextButton->setVisible(false);
+    ui->ResetButton->setVisible(false);
 
     timer->start(1000);
 }
@@ -229,6 +235,8 @@ bool ExerciseWidget::focusNextPrevChild(bool next)
 void ExerciseWidget::keyPressEvent(QKeyEvent *e)
 {
     QString eventText;
+    if (soundManager)
+        soundManager->playClick();
     if (e->key() == Qt::Key_Tab) {
         eventText = "\t";
     } else if (e->key() == Qt::Key_Escape) {
@@ -329,4 +337,15 @@ void ExerciseWidget::on_SelectTextButton_clicked()
     loadCurrentBlock();
     initCounters();
     timer->start(1000);
+
+    emit textSelected();
+}
+
+void ExerciseWidget::setSoundManager(SoundManager* soundManager)
+{
+    ExerciseWidget::soundManager = soundManager;
+}
+
+const QString ExerciseWidget::getFilename() const {
+    return currentFilePath;
 }
