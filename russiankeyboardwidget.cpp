@@ -162,7 +162,11 @@ RussianKeyboardWidget::RussianKeyboardWidget(QWidget *parent) {
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setObjectName("keyboardLine4");
 
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("LShift", new ActionButton("Shift", nullptr, parent, "", nullptr, 50));
+#elif defined(Q_OS_WIN)
+    mapKeyToButton.insert("LShift", new ActionButton("Shift", nullptr, parent, "", nullptr, 42));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["LShift"]);
     mapKeyToButton.insert("я", new ActionButton("Я", new Qt::Key(Qt::Key(1071)), parent, "я"));
     mapKeyToButton.insert("Я", mapKeyToButton["я"]);
@@ -194,7 +198,11 @@ RussianKeyboardWidget::RussianKeyboardWidget(QWidget *parent) {
     mapKeyToButton.insert(".", new ActionButton(",", new Qt::Key(Qt::Key_Period), parent, ".", new Qt::Key(Qt::Key_Comma)));
     mapKeyToButton.insert(",", mapKeyToButton["."]);
     horizontalLayout->addWidget(mapKeyToButton["."]);
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("RShift", new ActionButton("Shift", nullptr, parent, "", nullptr, 62));
+#elif defined(Q_OS_WIN)
+    mapKeyToButton.insert("RShift", new ActionButton("Shift", nullptr, parent, "", nullptr, 54));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["RShift"]);
 
     stretch = {11, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 11};
@@ -205,18 +213,34 @@ RussianKeyboardWidget::RussianKeyboardWidget(QWidget *parent) {
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setObjectName("keyboardLine5");
 
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("LCtrl", new ActionButton("Ctrl", nullptr, parent, "", nullptr, 37));
+#elif defined(Q_OS_WIN)
+    mapKeyToButton.insert("LCtrl", new ActionButton("Ctrl", nullptr, parent, "", nullptr, 29));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["LCtrl"]);
     mapKeyToButton.insert("Meta", new ActionButton("Meta", new Qt::Key(Qt::Key_Meta), parent, ""));
     horizontalLayout->addWidget(mapKeyToButton["Meta"]);
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("LAlt", new ActionButton("Alt", nullptr, parent, "", nullptr, 64));
+#elif defined(Q_OS_WIN)
+    mapKeyToButton.insert("LAlt", new ActionButton("Alt", nullptr, parent, "", nullptr, 56));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["LAlt"]);
     mapKeyToButton.insert("Space", new ActionButton(" ", new Qt::Key(Qt::Key_Space), parent, ""));
     mapKeyToButton.insert(" ", mapKeyToButton["Space"]);
     horizontalLayout->addWidget(mapKeyToButton["Space"]);
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("RAlt", new ActionButton("Alt", nullptr, parent, "", nullptr, 108));
+#elif defined (Q_OS_WIN)
+    mapKeyToButton.insert("RAlt", new ActionButton("Alt", nullptr, parent, "", nullptr, 57400));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["RAlt"]);
+#ifdef Q_OS_LINUX
     mapKeyToButton.insert("RCtrl", new ActionButton("Ctrl", nullptr, parent, "", nullptr, 105));
+#elif defined(Q_OS_WIN)
+    mapKeyToButton.insert("RCtrl", new ActionButton("Ctrl", nullptr, parent, "", nullptr, 57373));
+#endif
     horizontalLayout->addWidget(mapKeyToButton["RCtrl"]);
 
     stretch = {5, 5, 5, 30, 5, 5};

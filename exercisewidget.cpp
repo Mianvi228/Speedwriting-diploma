@@ -23,11 +23,10 @@ SoundManager* ExerciseWidget::soundManager = nullptr;
 
 inline void formatEndsOfLines(QString &s)
 {
-#ifdef Q_OS_LINUX
-    s.replace("\n", "¶\n");
-#elif defined(Q_OS_WIN)
-    s.replace("\r\n", "¶\n");
-#endif
+    if (s.contains('\r'))
+        s.replace("\r\n", "¶\n");
+    else
+        s.replace("\n", "¶\n");
 }
 
 void ExerciseWidget::initCounters()
