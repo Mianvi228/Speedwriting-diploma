@@ -117,13 +117,13 @@ void HistoryWidget::paintEvent(QPaintEvent *event)
     painter.setPen(QPen(QColor("#d0d7e2"), 1));
     painter.drawRect(plotRect);
     const QString title = exerciseIdFilter.isEmpty()
-        ? tr("Completed sessions: KPM and accuracy %")
-        : tr("Exercise %1: KPM and accuracy %").arg(exerciseIdFilter);
+        ? tr("Завершенные сессии: КВМ и точность %")
+        : tr("Упражнение %1: КВМ и точность%").arg(exerciseIdFilter);
     painter.drawText(QRect(0, 8, width(), 20), Qt::AlignCenter, title);
 
     if (kpmSeries.isEmpty()) {
         painter.setPen(QColor("#c0c8d3"));
-        painter.drawText(plotRect, Qt::AlignCenter, tr("No completed sessions yet"));
+        painter.drawText(plotRect, Qt::AlignCenter, tr("Нету завершенных сессий"));
         return;
     }
 
@@ -192,18 +192,18 @@ void HistoryWidget::paintEvent(QPaintEvent *event)
         painter.drawEllipse(p, 3, 3);
 
     painter.setPen(QColor("#52c7ea"));
-    painter.drawText(plotRect.left(), plotRect.bottom() + 22, tr("KPM"));
+    painter.drawText(plotRect.left(), plotRect.bottom() + 22, tr("КВМ"));
     painter.setPen(QColor("#7ee787"));
-    painter.drawText(plotRect.left() + 90, plotRect.bottom() + 22, tr("Accuracy %"));
+    painter.drawText(plotRect.left() + 90, plotRect.bottom() + 22, tr("Точность %"));
     painter.setPen(QColor("#c0c8d3"));
-    painter.drawText(plotRect.right() - 150, plotRect.bottom() + 22, tr("Sessions %1-%2")
+    painter.drawText(plotRect.right() - 150, plotRect.bottom() + 22, tr("Сессии %1-%2")
                      .arg(startSessionIndex + 1)
                      .arg(endSessionIndex));
 
     if (hasHoveredPoint) {
          const QString metricText = hoveredPoint.label == "KPM"
-            ? tr("KPM: %1").arg(static_cast<int>(qRound(hoveredPoint.value)))
-            : tr("Accuracy: %1%").arg(QString::number(hoveredPoint.value, 'f', 1));
+            ? tr("КВМ: %1").arg(static_cast<int>(qRound(hoveredPoint.value)))
+            : tr("Точность: %1%").arg(QString::number(hoveredPoint.value, 'f', 1));
         const QString valueText = hoveredPoint.exerciseId + QLatin1Char('\n')
                                    + hoveredPoint.dateTime + QLatin1Char('\n')
                                    + timeFormat(hoveredPoint.durationSeconds) + QLatin1Char('\n')

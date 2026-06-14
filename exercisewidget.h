@@ -21,11 +21,11 @@ class ExerciseWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ExerciseWidget(QWidget *parent = nullptr);
+    explicit ExerciseWidget(const QString &kKeyboardLanguageId, QWidget *parent = nullptr);
     ~ExerciseWidget();
 
-    void startWithDefinition(const ExerciseDefinition &definition);
     static void setSoundManager(SoundManager* soundManager);
+    void startWithDefinition(const ExerciseDefinition &definition);
     const QString getFilename() const;
 
 signals:
@@ -40,7 +40,7 @@ private slots:
     void on_ResetButton_clicked();
 
 public slots:
-    void on_SelectTextButton_clicked();
+    void on_SelectTextButton_clicked(const ExerciseDefinition &definition);
 
 private:
     Ui::ExerciseWidget *ui;
@@ -66,8 +66,8 @@ private:
     QString currentFilePath;
 
     void initCounters();
-    void initHelpKeyboard(const QString &keyboardLanguageId = QStringLiteral("english"));
-    void initWindow();
+    void initHelpKeyboard(const QString &keyboardLanguageId);
+    void initWindow(const QString &keyboardLanguageId);
     void loadText(const QString &text);
     void setKeyboardForLanguage(const QString &keyboardLanguageId);
     void applyKeyboardVisibility();
@@ -75,6 +75,7 @@ private:
     void loadCurrentBlock();
     void saveCompletedSession();
     void pause();
+    bool isFileForCurLang();
 };
 
 #endif // EXERCISEWIDGET_H

@@ -31,7 +31,7 @@ EnglishKeyboardWidget::EnglishKeyboardWidget(QWidget *parent) {
     mapKeyToButton.insert("5", new ActionButton("5", new Qt::Key(Qt::Key_5), parent, "%", new Qt::Key(Qt::Key_Percent)));
     mapKeyToButton.insert("%", mapKeyToButton["5"]);
     horizontalLayout->addWidget(mapKeyToButton["5"]);
-    mapKeyToButton.insert("6", new ActionButton("6", new Qt::Key(Qt::Key_6), parent, "^", new Qt::Key(Qt::Key_Percent)));
+    mapKeyToButton.insert("6", new ActionButton("6", new Qt::Key(Qt::Key_6), parent, "^", new Qt::Key(Qt::Key_AsciiCircum)));
     mapKeyToButton.insert("^", mapKeyToButton["6"]);
     horizontalLayout->addWidget(mapKeyToButton["6"]);
     mapKeyToButton.insert("7", new ActionButton("7", new Qt::Key(Qt::Key_7), parent, "&", new Qt::Key(Qt::Key_Ampersand)));
@@ -255,7 +255,6 @@ void EnglishKeyboardWidget::applyColumnColors()
         }
     };
 
-    // NOTE: '`' belongs to the first group.
     applyGroup("`1qaz", colors[0], pressedFromNormal(colors[0]));
     applyGroup("2wsx", colors[1], pressedFromNormal(colors[1]));
     applyGroup("3edc", colors[2], pressedFromNormal(colors[2]));
@@ -371,6 +370,7 @@ const QMap<QChar, QStringList> EnglishKeyboardWidget::mapCharToKeys = []() {
     map.insert('?', QStringList{"LShift", "/"});
 
     map.insert(QChar(0x00B6), QStringList{"Enter"});
+    map.insert('\n', map[QChar(0x0086)]);
     map.insert(' ', QStringList{"Space"});
     map.insert('\t', QStringList{"Tab"});
 
@@ -380,4 +380,36 @@ const QMap<QChar, QStringList> EnglishKeyboardWidget::mapCharToKeys = []() {
 bool EnglishKeyboardWidget::eventFilter(QObject* obj, QEvent* event)
 {
     return QWidget::eventFilter(obj, event);
+}
+
+void EnglishKeyboardWidget::highlightChar(QChar c) {
+    if (mapCharToKeys.contains(c))
+    {
+        QStringList sl = mapCharToKeys[c];
+        foreach (auto iter, sl)
+        {
+            ActionButton *button = mapKeyToButton[iter];
+
+            if (button)
+                button->setHighlighted();
+        }
+    }
+};
+
+void EnglishKeyboardWidget::unhighlightChar(QChar c) {
+    if (mapCharToKeys.contains(c))
+    {
+        QStringList sl = mapCharToKeys[c];
+        foreach (auto iter, sl)
+        {
+            ActionButton *button = mapKeyToButton[iter];
+
+            if (button)
+                button->unsetHighlighted();
+        }
+    }
+};
+
+bool EnglishKeyboardWidget::isCharIn(QChar c) {
+    return mapCharToKeys.contains(c);
 }

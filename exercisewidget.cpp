@@ -1,4 +1,5 @@
 #include "exercisewidget.h"
+
 #include "savinglineedit.h"
 #include "ui_exercisewidget.h"
 #include "QKeyEvent"
@@ -176,7 +177,7 @@ void ExerciseWidget::startWithDefinition(const ExerciseDefinition &definition)
 
     ui->SelectTextButton->setVisible(false);
     ui->ResetButton->setVisible(false);
-    setKeyboardForLanguage(definition.keyboardLanguageId);
+    //setKeyboardForLanguage(definition.keyboardLanguageId);
     if (!definition.id.contains("Free typing"))
         loadText(definition.text);
     initCounters();
@@ -184,7 +185,7 @@ void ExerciseWidget::startWithDefinition(const ExerciseDefinition &definition)
     timer->start(1000);
 }
 
-void ExerciseWidget::initWindow()
+void ExerciseWidget::initWindow(const QString &kKeyboardLanguageId)
 {
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -203,7 +204,7 @@ void ExerciseWidget::initWindow()
         }
     });
     ui->TextBox->setText(s);
-    initHelpKeyboard();
+    initHelpKeyboard(kKeyboardLanguageId);
 
     ui->SelectTextButton->setVisible(false);
     ui->ResetButton->setVisible(false);
@@ -211,12 +212,12 @@ void ExerciseWidget::initWindow()
     timer->start(1000);
 }
 
-ExerciseWidget::ExerciseWidget(QWidget *parent)
+ExerciseWidget::ExerciseWidget(const QString& kKeyboardLanguageId, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ExerciseWidget)
 {
     ui->setupUi(this);
-    initWindow();
+    initWindow(kKeyboardLanguageId);
 }
 
 ExerciseWidget::~ExerciseWidget()
@@ -245,6 +246,8 @@ void ExerciseWidget::keyPressEvent(QKeyEvent *e)
         eventText = e->text();
     }
     qInfo() << e->nativeScanCode();
+    if (!e->text().isEmpty())
+        qInfo() << e->text()[0].unicode();
     qInfo() << e->keyCombination();
     eventText.replace("\r", "¶\n");
     if (!eventText.isEmpty())
@@ -325,7 +328,7 @@ void ExerciseWidget::on_ResetButton_clicked()
     timer->start(1000);
 }
 
-void ExerciseWidget::on_SelectTextButton_clicked()
+void ExerciseWidget::on_SelectTextButton_clicked(const ExerciseDefinition &definition)
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open text file"), "./Texts/", tr("Text Files (*.txt)"));
     if (filename.isEmpty())
@@ -333,6 +336,13 @@ void ExerciseWidget::on_SelectTextButton_clicked()
 
     currentFilePath = filename;
     fileReader.selectFile(filename);
+    if (!isFileForCurLang())
+    {
+        QMessageBox::information(this, "Bad file", QString("File contains other symbols: %1.").arg(s));
+        currentFilePath = "";
+        return;
+    }
+    fileReader.resetFile();
     fileReader.readBlock();
     loadCurrentBlock();
     initCounters();
@@ -346,6 +356,24 @@ void ExerciseWidget::setSoundManager(SoundManager* soundManager)
     ExerciseWidget::soundManager = soundManager;
 }
 
-const QString ExerciseWidget::getFilename() const {
+const QString ExerciseWidget::getFilename() const
+{
     return currentFilePath;
+}
+
+bool ExerciseWidget::isFileForCurLang()
+{
+    QString s = "";
+    while (!fileReader.isEof())
+    {
+        fileReader.readBlock();
+        s = fileReader.getBlock();
+        for (QChar c : s)
+            if (!keyboard->isCharIn(c))
+            {
+                this->s = c;
+                return false;
+            }
+    }
+    return true;
 }

@@ -6,7 +6,8 @@
 #include <QVBoxLayout>
 
 namespace {
-const QString kFreeTypingEnId = QStringLiteral("Free typing en");
+const QString kEnFreeTypingId = QStringLiteral("Free typing en");
+const QString kRuFreeTypingId = QStringLiteral("Free typing ru");
 }
 
 ExerciseOverviewWidget::ExerciseOverviewWidget(const ExerciseDefinition &definition, QWidget *parent)
@@ -14,12 +15,13 @@ ExerciseOverviewWidget::ExerciseOverviewWidget(const ExerciseDefinition &definit
     , definition(definition)
 {
     historyChart = new HistoryWidget(this, definition.id);
-    if (definition.id == kFreeTypingEnId) {
-        startButton = new QPushButton(tr("Select text"), this);
+    if (definition.id == kEnFreeTypingId ||
+        definition.id == kRuFreeTypingId) {
+        startButton = new QPushButton(tr("Выбрать текст"), this);
         startButton->setMinimumHeight(40);
         connect(startButton, &QPushButton::clicked, this, &ExerciseOverviewWidget::onSelectText);
     } else {
-        startButton = new QPushButton(tr("Start exercise"), this);
+        startButton = new QPushButton(tr("Начать упражнение"), this);
         startButton->setMinimumHeight(40);
         connect(startButton, &QPushButton::clicked, this, &ExerciseOverviewWidget::onStartExercise);
     }

@@ -33,6 +33,8 @@ private:
     void populateExercisesForLanguage(const QString &languageId);
     QWidget *exerciseWidgetForId(const QString &exerciseId);
     void showPlaceholder();
+    void initEnglishExercises();
+    void initRussianExercises();
 
     QListWidget *languageList = nullptr;
     QListWidget *exerciseList = nullptr;

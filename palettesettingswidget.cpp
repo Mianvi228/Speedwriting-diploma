@@ -22,13 +22,13 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
     // Default color row (keys not in any group)
     {
         auto *row = new QHBoxLayout();
-        auto *label = new QLabel(tr("Default (not in groups)"));
+        auto *label = new QLabel(tr("Обычные клавиши"));
         auto *btn = new QPushButton();
         defaultColorButton = btn;
         btn->setFixedSize(56, 28);
         btn->setObjectName("defaultColorBtn");
         connect(btn, &QPushButton::clicked, this, [this, btn]() {
-            QColor picked = QColorDialog::getColor(palette.defaultColor(), this, tr("Pick default key color"));
+            QColor picked = QColorDialog::getColor(palette.defaultColor(), this, tr("Выберите обычный цвет"));
             if (!picked.isValid())
                 return;
             palette.setDefaultColor(picked);
@@ -46,7 +46,7 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
 
     for (int i = 0; i < KeyboardPalette::GroupCount; ++i) {
         auto *row = new QHBoxLayout();
-        auto *label = new QLabel(QString("Group %1 (%2)").arg(i + 1).arg(groupKeys(i)));
+        auto *label = new QLabel(QString("Группа %1 (%2)").arg(i + 1).arg(groupKeys(i)));
         auto *btn = new QPushButton();
         btn->setFixedSize(56, 28);
         btn->setObjectName(QString("groupColorBtn_%1").arg(i));
@@ -61,7 +61,7 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
 
     {
         auto *row = new QHBoxLayout();
-        showKeyboardCheckBox = new QCheckBox(tr("Show keyboard during exercise"), this);
+        showKeyboardCheckBox = new QCheckBox(tr("Показывать клавиатуру во время упражнения"), this);
         row->addWidget(showKeyboardCheckBox);
         row->addStretch(1);
         root->addLayout(row);
@@ -72,8 +72,8 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
     }
 
     auto *actionsRow = new QHBoxLayout();
-    auto *saveBtn = new QPushButton(tr("Save"));
-    auto *resetBtn = new QPushButton(tr("Reset defaults"));
+    auto *saveBtn = new QPushButton(tr("Сохранить"));
+    auto *resetBtn = new QPushButton(tr("Сбросить значения"));
     actionsRow->addWidget(saveBtn);
     actionsRow->addWidget(resetBtn);
 
@@ -89,14 +89,14 @@ PaletteSettingsWidget::PaletteSettingsWidget(QWidget *parent)
 QString PaletteSettingsWidget::groupKeys(int groupIndex)
 {
     switch (groupIndex) {
-    case 0: return QStringLiteral("Left hand little finger");
-    case 1: return QStringLiteral("Left hand ring finger");
-    case 2: return QStringLiteral("Left hand middle finger");
-    case 3: return QStringLiteral("Left hand index finger");
-    case 4: return QStringLiteral("Right hand index finger");
-    case 5: return QStringLiteral("Right hand middle finger");
-    case 6: return QStringLiteral("Right hand ring finger");
-    case 7: return QStringLiteral("Right hand little finger");
+    case 0: return QStringLiteral("Левая рука мизинец");
+    case 1: return QStringLiteral("Левая рука безымянный палец");
+    case 2: return QStringLiteral("Левая рука средний палец");
+    case 3: return QStringLiteral("Левая рука указательный палец");
+    case 4: return QStringLiteral("Правая рука указательный палец");
+    case 5: return QStringLiteral("Правая рука средний палец");
+    case 6: return QStringLiteral("Правая рука безымянный палец");
+    case 7: return QStringLiteral("Правая рука мезинец");
     default: return QString();
     }
 }
@@ -144,7 +144,7 @@ void PaletteSettingsWidget::onPickColor(int groupIndex)
 {
     const QVector<QColor> colors = palette.normalColors();
     const QColor current = (groupIndex >= 0 && groupIndex < colors.size()) ? colors[groupIndex] : QColor("#000000");
-    QColor picked = QColorDialog::getColor(current, this, tr("Pick color for group %1").arg(groupIndex + 1));
+    QColor picked = QColorDialog::getColor(current, this, tr("Выберите цвет для группы %1").arg(groupIndex + 1));
     if (!picked.isValid())
         return;
 
@@ -155,7 +155,7 @@ void PaletteSettingsWidget::onPickColor(int groupIndex)
 void PaletteSettingsWidget::onSaveClicked()
 {
     applyChanges();
-    QMessageBox::information(this, tr("Settings saved"), tr("Keyboard palette has been updated."));
+    QMessageBox::information(this, tr("Настройки сохранены"), tr("Цвета клавиатуры обновлены."));
     emit done();
 }
 

@@ -21,8 +21,8 @@ SettingsWidget::SettingsWidget(SoundManager *soundManager, QWidget *parent)
     : QWidget(parent)
     , soundManager(soundManager)
 {
-    settingInfoById.insert(kKeyboardColorsId, {kKeyboardColorsId, tr("Keyboard colors")});
-    settingInfoById.insert(kSoundSettingsId, {kSoundSettingsId, tr("Sound")});
+    settingInfoById.insert(kKeyboardColorsId, {kKeyboardColorsId, tr("Клавиатура")});
+    settingInfoById.insert(kSoundSettingsId, {kSoundSettingsId, tr("Звук")});
 
     auto *rootLayout = new QVBoxLayout(this);
 
@@ -36,7 +36,7 @@ SettingsWidget::SettingsWidget(SoundManager *soundManager, QWidget *parent)
     auto *rightPanel = new QWidget(this);
     auto *rightLayout = new QVBoxLayout(rightPanel);
     rightLayout->setContentsMargins(0, 0, 0, 0);
-    rightLayout->addWidget(new QLabel(tr("Settings"), rightPanel));
+    rightLayout->addWidget(new QLabel(tr("Настройки"), rightPanel));
 
     settingsStack = new QStackedWidget(rightPanel);
     rightLayout->addWidget(settingsStack, 1);
@@ -46,7 +46,7 @@ SettingsWidget::SettingsWidget(SoundManager *soundManager, QWidget *parent)
     contentLayout->addWidget(rightPanel, 3);
     rootLayout->addLayout(contentLayout, 1);
 
-    auto *backButton = new QPushButton(tr("Back to menu"), this);
+    auto *backButton = new QPushButton(tr("Назад в меню"), this);
     rootLayout->addWidget(backButton);
 
     connect(settingsList, &QListWidget::currentRowChanged, this, &SettingsWidget::onSettingChanged);
@@ -87,8 +87,8 @@ void SettingsWidget::promptSaveChangesForSetting(const QString &settingId)
 
     const QMessageBox::StandardButton answer = QMessageBox::question(
         this,
-        tr("Save settings"),
-        tr("Save changes before leaving this setting?"),
+        tr("Сохранение изменений"),
+        tr("Сохранить изменения перед выходом из настроек?"),
         QMessageBox::Yes | QMessageBox::No,
         QMessageBox::Yes);
 
@@ -115,7 +115,7 @@ void SettingsWidget::showPlaceholder()
     if (!settingPanels.contains(placeholderId)) {
         auto *placeholder = new QWidget(this);
         auto *layout = new QVBoxLayout(placeholder);
-        auto *label = new QLabel(tr("Select a setting"), placeholder);
+        auto *label = new QLabel(tr("Выберите настройку"), placeholder);
         label->setAlignment(Qt::AlignCenter);
         layout->addWidget(label);
         settingPanels.insert(placeholderId, placeholder);
@@ -132,7 +132,7 @@ QWidget *SettingsWidget::settingsPanelForId(const QString &settingId)
     QWidget *panel = nullptr;
     if (settingId == kKeyboardColorsId) {
         paletteSettingsWidget = new PaletteSettingsWidget(this);
-        connect(paletteSettingsWidget, &PaletteSettingsWidget::done, this, &SettingsWidget::done);
+        //connect(paletteSettingsWidget, &PaletteSettingsWidget::done, this, &SettingsWidget::done);
         panel = paletteSettingsWidget;
     } else if (settingId == kSoundSettingsId) {
         soundSettingsWidget = new SoundSettingsWidget(soundManager, this);

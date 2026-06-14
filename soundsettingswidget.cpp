@@ -18,11 +18,11 @@ SoundSettingsWidget::SoundSettingsWidget(SoundManager *soundManager, QWidget *pa
     auto *root = new QVBoxLayout(this);
     root->setContentsMargins(16, 16, 16, 16);
 
-    clickSoundsCheckBox = new QCheckBox(tr("Play key click sounds"), this);
+    clickSoundsCheckBox = new QCheckBox(tr("Включить звук нажатий"), this);
     root->addWidget(clickSoundsCheckBox);
 
     auto *volumeRow = new QHBoxLayout();
-    volumeRow->addWidget(new QLabel(tr("Volume"), this));
+    volumeRow->addWidget(new QLabel(tr("Громкость"), this));
     volumeSlider = new QSlider(Qt::Horizontal, this);
     volumeSlider->setRange(0, 100);
     volumeValueLabel = new QLabel(this);
@@ -31,9 +31,14 @@ SoundSettingsWidget::SoundSettingsWidget(SoundManager *soundManager, QWidget *pa
     volumeRow->addWidget(volumeValueLabel);
     root->addLayout(volumeRow);
 
+    auto soundButtonRow = new QHBoxLayout();
+    auto *playSoundButton = new QPushButton("Проиграть звук нажатия", this);
+    soundButtonRow->addWidget(playSoundButton);
+    root->addLayout(soundButtonRow);
+
     auto *actionsRow = new QHBoxLayout();
-    auto *saveBtn = new QPushButton(tr("Save"), this);
-    auto *resetBtn = new QPushButton(tr("Reset defaults"), this);
+    auto *saveBtn = new QPushButton(tr("Сохранить"), this);
+    auto *resetBtn = new QPushButton(tr("Сбросить значения"), this);
     actionsRow->addWidget(saveBtn);
     actionsRow->addWidget(resetBtn);
     root->addLayout(actionsRow);
@@ -43,6 +48,7 @@ SoundSettingsWidget::SoundSettingsWidget(SoundManager *soundManager, QWidget *pa
     connect(volumeSlider, &QSlider::valueChanged, this, &SoundSettingsWidget::onVolumeChanged);
     connect(saveBtn, &QPushButton::clicked, this, &SoundSettingsWidget::onSaveClicked);
     connect(resetBtn, &QPushButton::clicked, this, &SoundSettingsWidget::onResetClicked);
+    connect(playSoundButton, &QPushButton::clicked, this, &SoundSettingsWidget::onPlaySoundClicked);
 
     refreshControls();
 }
@@ -77,7 +83,7 @@ void SoundSettingsWidget::onVolumeChanged(int value)
 void SoundSettingsWidget::onSaveClicked()
 {
     applyChanges();
-    QMessageBox::information(this, tr("Settings saved"), tr("Sound settings have been updated."));
+    QMessageBox::information(this, tr("Настройки сохранены"), tr("Настройки звука обновлены."));
 }
 
 bool SoundSettingsWidget::hasUnsavedChanges() const
@@ -119,4 +125,9 @@ void SoundSettingsWidget::onResetClicked()
 
     clickSoundsCheckBox->blockSignals(false);
     volumeSlider->blockSignals(false);
+}
+
+void SoundSettingsWidget::onPlaySoundClicked()
+{
+    this->soundManager->playClick();
 }

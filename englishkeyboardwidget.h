@@ -2,8 +2,8 @@
 #define ENGLISHKEYBOARDWIDGET_H
 
 #include "keyboardwidget.h"
+#include "actionbutton.h"
 #include <QStringList>
-
 
 class EnglishKeyboardWidget : public KeyboardWidget
 {
@@ -11,32 +11,9 @@ class EnglishKeyboardWidget : public KeyboardWidget
 public:
     EnglishKeyboardWidget(QWidget *parent = nullptr);
     ~EnglishKeyboardWidget() {};
-    void highlightChar(QChar c) override {
-        if (mapCharToKeys.contains(c))
-        {
-            QStringList sl = mapCharToKeys[c];
-            foreach (auto iter, sl)
-            {
-                ActionButton *button = mapKeyToButton[iter];
-
-                if (button)
-                    button->setHighlighted();
-            }
-        }
-    };
-    void unhighlightChar(QChar c) override  {
-        if (mapCharToKeys.contains(c))
-        {
-            QStringList sl = mapCharToKeys[c];
-            foreach (auto iter, sl)
-            {
-                ActionButton *button = mapKeyToButton[iter];
-
-                if (button)
-                    button->unsetHighlighted();
-            }
-        }
-    };
+    void highlightChar(QChar c) override;
+    void unhighlightChar(QChar c) override;
+    bool isCharIn(QChar c) override;
     void highlightKey(QKeySequence &qks) override {};
     void unhighlightKey(QKeySequence &qks) override {};
     void unhilightAll() override {};

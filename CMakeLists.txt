@@ -48,6 +48,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         sounds.qrc
         soundmanager.h soundmanager.cpp
         soundsettingswidget.h soundsettingswidget.cpp
+        russiankeyboardwidget.h russiankeyboardwidget.cpp
+        helpinformationwidget.h helpinformationwidget.cpp
+        helpInformationDefinition.h
+
+
 
 
     )

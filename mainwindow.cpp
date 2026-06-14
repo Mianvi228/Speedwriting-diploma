@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "languageexercisewidget.h"
+#include "helpinformationwidget.h"
 #include "exercisedefinition.h"
 #include "exercisewidget.h"
 #include "historywidget.h"
@@ -33,19 +34,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     stackedLayout->addWidget(new QWidget(this));
 
-    mainMenuButton = new QPushButton("Menu");
-    historyButton = new QPushButton("History");
+    mainMenuButton = new QPushButton("Меню");
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(mainMenuButton);
-    buttonLayout->addWidget(historyButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
     mainLayout->addLayout(buttonLayout);
     mainLayout->addWidget(stackContainer);
 
     connect(mainMenuButton, &QPushButton::clicked, this, &MainWindow::mainMenu);
-    connect(historyButton, &QPushButton::clicked, this, &MainWindow::pageHistory);
 
     mainMenu();
 
@@ -65,16 +63,20 @@ void MainWindow::mainMenu()
 {
     QWidget *homePage = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(homePage);
-    QPushButton *startExerciseButton = new QPushButton("Start exercise");
-    QPushButton *openHistoryButton = new QPushButton("View history metrics");
-    QPushButton *openSettingsButton = new QPushButton(tr("Settings"));
+    QPushButton *startExerciseButton = new QPushButton("Меню упражнений");
+    QPushButton *openHelpInformationButton = new QPushButton("Полезные статьи");
+    QPushButton *openHistoryButton = new QPushButton("История упражнений");
+    QPushButton *openSettingsButton = new QPushButton(tr("Настройки"));
     startExerciseButton->setMinimumHeight(40);
+    openHelpInformationButton->setMinimumHeight(40);
     openHistoryButton->setMinimumHeight(40);
     openSettingsButton->setMinimumHeight(40);
     layout->addWidget(startExerciseButton);
+    layout->addWidget(openHelpInformationButton);
     layout->addWidget(openHistoryButton);
     layout->addWidget(openSettingsButton);
     connect(startExerciseButton, &QPushButton::clicked, this, &MainWindow::exerciseMenu);
+    connect(openHelpInformationButton, &QPushButton::clicked, this, &MainWindow::helpInformationMenu);
     connect(openHistoryButton, &QPushButton::clicked, this, &MainWindow::pageHistory);
     connect(openSettingsButton, &QPushButton::clicked, this, &MainWindow::pageSettings);
     replaceCurrentPage(homePage);
@@ -91,9 +93,15 @@ void MainWindow::exerciseMenu()
     replaceCurrentPage(exercisePage);
 }
 
+void MainWindow::helpInformationMenu()
+{
+    HelpInformationWidget *helpInformationPage = new HelpInformationWidget(this);
+    replaceCurrentPage(helpInformationPage);
+}
+
 void MainWindow::pageDefinitionExercise(const ExerciseDefinition &definition)
 {
-    ExerciseWidget *exercisePage = new ExerciseWidget(this);
+    ExerciseWidget *exercisePage = new ExerciseWidget(definition.keyboardLanguageId, this);
     connect(exercisePage, &ExerciseWidget::exerciseCompleted, this, &MainWindow::exerciseMenu);
     replaceCurrentPage(exercisePage);
     exercisePage->startWithDefinition(definition);
@@ -102,8 +110,8 @@ void MainWindow::pageDefinitionExercise(const ExerciseDefinition &definition)
 
 void MainWindow::pageSelectedText(const ExerciseDefinition &definition)
 {
-    ExerciseWidget *exercisePage = new ExerciseWidget(this);
-    exercisePage->on_SelectTextButton_clicked();
+    ExerciseWidget *exercisePage = new ExerciseWidget(definition.keyboardLanguageId, this);
+    exercisePage->on_SelectTextButton_clicked(definition);
     if (exercisePage->getFilename().isEmpty())
         return;
     connect(exercisePage, &ExerciseWidget::exerciseCompleted, this, &MainWindow::exerciseMenu);

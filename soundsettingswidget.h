@@ -24,6 +24,7 @@ private slots:
     void onVolumeChanged(int value);
     void onSaveClicked();
     void onResetClicked();
+    void onPlaySoundClicked();
 
 private:
     void refreshControls();

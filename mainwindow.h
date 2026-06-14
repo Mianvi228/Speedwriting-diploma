@@ -28,6 +28,7 @@ protected:
 private slots:
     void mainMenu();
     void exerciseMenu();
+    void helpInformationMenu();
     void pageHistory();
     void pageSettings();
     void pageDefinitionExercise(const ExerciseDefinition &definition);
@@ -39,7 +40,6 @@ private:
     QStackedLayout *stackedLayout;
     QPushButton *mainMenuButton;
     QPushButton *exerciseMenuButton;
-    QPushButton *historyButton;
     SoundManager *soundManager;
 };
 
