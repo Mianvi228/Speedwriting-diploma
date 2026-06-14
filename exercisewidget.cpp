@@ -77,7 +77,7 @@ void ExerciseWidget::finishExercise(bool withSave)
     ui->TextBox->setText("");
     if (withSave) saveCompletedSession();
     //releaseKeyboard();
-    QMessageBox::information(this, tr("Exercise finished"), tr("Exercise finished"));
+    QMessageBox::information(this, tr("Упражнение завершено"), tr("Упражнение завершено"));
     emit exerciseCompleted();
 }
 
@@ -289,11 +289,11 @@ void ExerciseWidget::pause()
 {
     timer->stop();
     QMessageBox *msgBox = new QMessageBox();
-    msgBox->setText("Paused");
-    msgBox->setWindowTitle("Pause");
+    msgBox->setText("Пауза");
+    msgBox->setWindowTitle("Пауза");
 
-    QPushButton *continueButton = msgBox->addButton("Continue", QMessageBox::AcceptRole);
-    QPushButton *rejectButton = msgBox->addButton("Exit", QMessageBox::AcceptRole);
+    QPushButton *continueButton = msgBox->addButton("Продолжить", QMessageBox::AcceptRole);
+    QPushButton *rejectButton = msgBox->addButton("Выйти", QMessageBox::AcceptRole);
 
     msgBox->setDefaultButton(continueButton);
 
@@ -337,7 +337,7 @@ void ExerciseWidget::on_SelectTextButton_clicked(const ExerciseDefinition &defin
     fileReader.selectFile(filename);
     if (!isFileForCurLang())
     {
-        QMessageBox::information(this, "Bad file", QString("File contains other symbols: %1.").arg(s));
+        QMessageBox::information(this, "Плохой файл", QString("Файл содержит лишние символы: %1.").arg(s));
         currentFilePath = "";
         return;
     }

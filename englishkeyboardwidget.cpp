@@ -395,6 +395,7 @@ const QMap<QChar, QStringList> EnglishKeyboardWidget::mapCharToKeys = []() {
 
     map.insert(QChar(0x00B6), QStringList{"Enter"});
     map.insert('\n', map[QChar(0x0086)]);
+    map.insert('\r', map[QChar(0x0086)]);
     map.insert(' ', QStringList{"Space"});
     map.insert('\t', QStringList{"Tab"});
 
