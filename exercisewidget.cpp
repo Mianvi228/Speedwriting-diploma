@@ -289,7 +289,7 @@ void ExerciseWidget::pause()
 {
     timer->stop();
     QMessageBox *msgBox = new QMessageBox();
-    msgBox->setText("Пауза");
+    msgBox->setText("Продолжить?");
     msgBox->setWindowTitle("Пауза");
 
     QPushButton *continueButton = msgBox->addButton("Продолжить", QMessageBox::AcceptRole);
